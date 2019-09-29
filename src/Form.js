@@ -1,21 +1,20 @@
-import React, { Component } from 'react';
-import ipfsClient from 'ipfs-http-client';
-import CryptoJs from 'crypto-js';
+import React, { Component } from "react";
+import ipfsClient from "ipfs-http-client";
+import CryptoJs from "crypto-js";
 
-const Buffer = require('buffer/').Buffer;
+const Buffer = require("buffer/").Buffer;
 
 export default class Form extends Component {
-
   constructor(props) {
     super(props);
 
-    const ipfs = ipfsClient('localhost', '5001', { protocol: 'http' });
+    const ipfs = ipfsClient("localhost", "5001", { protocol: "http" });
 
-    this.state = { 
-      value: '',
+    this.state = {
+      value: "",
       ipfs: ipfs,
-      saved: '',
-      key: ''
+      saved: "",
+      key: ""
     };
 
     this.handleChangeKey = this.handleChangeKey.bind(this);
@@ -27,7 +26,7 @@ export default class Form extends Component {
   handleChangeValue(event) {
     this.setState({ value: event.target.value });
   }
-  
+
   handleChangeKey(event) {
     this.setState({ key: event.target.value });
   }
@@ -37,23 +36,24 @@ export default class Form extends Component {
       path: _path,
       content: Buffer.from(JSON.stringify(_note))
     };
-  };
+  }
 
   handleSubmit(event) {
-    const cipheredNote = CryptoJs.AES.encrypt(this.state.value, this.state.key).toString();
+    const cipheredNote = CryptoJs.AES.encrypt(
+      this.state.value,
+      this.state.key
+    ).toString();
     const note = {
       content: cipheredNote
     };
-    
-    const payload = this.getPayload('test.json', note);
 
-    this.state.ipfs
-      .add(payload)
-      .then(res => {
-        this.setState({
-          saved: res[0].hash
-        });
+    const payload = this.getPayload("test.json", note);
+
+    this.state.ipfs.add(payload).then(res => {
+      this.setState({
+        saved: res[0].hash
       });
+    });
     event.preventDefault();
   }
 
@@ -63,21 +63,31 @@ export default class Form extends Component {
         <div>
           <label>
             Note:
-            <input type="text" value={this.state.value} onChange={this.handleChangeValue} />
+            <input
+              type="text"
+              value={this.state.value}
+              onChange={this.handleChangeValue}
+            />
           </label>
         </div>
         <div>
           <label>
             Key:
-            <input type="text" value={this.state.key} onChange={this.handleChangeKey} />
+            <input
+              type="text"
+              value={this.state.key}
+              onChange={this.handleChangeKey}
+            />
           </label>
         </div>
         <div>
           <button onClick={this.handleSubmit}> Go ! </button>
         </div>
-        
-      { this.state.saved ? `http://127.0.0.1:8080/ipfs/${this.state.saved}` : null }
+
+        {this.state.saved
+          ? `http://127.0.0.1:8080/ipfs/${this.state.saved}`
+          : null}
       </div>
     );
   }
-};
+}
